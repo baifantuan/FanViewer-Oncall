@@ -8,8 +8,11 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Any
+
+# 北京时区 UTC+8
+BEIJING_TZ = timezone(timedelta(hours=8))
 
 import httpx
 from langchain_core.tools import tool
@@ -25,7 +28,7 @@ COMMON_LABEL_KEYS = ("alertname", "severity", "instance", "job", "namespace", "p
 
 
 def _parse_active_at(active_at_str: str) -> datetime | None:
-    """将 Prometheus 返回的 activeAt（RFC3339 或带 Z 后缀）解析为 UTC 时间。"""
+    """将 Prometheus 返回的 activeAt（RFC3339 带 Z 后缀）解析为 UTC datetime。"""
     if not active_at_str:
         return None
     try:
@@ -36,6 +39,15 @@ def _parse_active_at(active_at_str: str) -> datetime | None:
         return dt.astimezone(timezone.utc)
     except ValueError:
         return None
+
+
+def _format_beijing_time(active_at_str: str) -> str:
+    """将 Prometheus UTC activeAt 转为北京时间字符串（YYYY-MM-DD HH:MM:SS）。"""
+    dt = _parse_active_at(active_at_str)
+    if dt is None:
+        return active_at_str  # 无法解析时原样返回
+    beijing_dt = dt.astimezone(BEIJING_TZ)
+    return beijing_dt.strftime("%Y-%m-%d %H:%M:%S")
 
 
 def _labels_identity(labels: dict[str, Any]) -> str:
@@ -138,6 +150,7 @@ def _simplify_alerts(result: dict[str, Any]) -> tuple[list[dict[str, Any]], dict
                 "summary": str(annotations.get("summary", "") or ""),
                 "state": state,
                 "active_at": active_at,
+                "active_at_beijing": _format_beijing_time(active_at),
                 "duration": calculate_duration(active_at),
             }
         )

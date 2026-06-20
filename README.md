@@ -337,9 +337,21 @@ Prometheus 会抓取两个目标：
 - `PrometheusIsAlive` — Prometheus 自身存活检测
 - `SuperBizAgentDown` — FastAPI 服务不可达告警
 - `HighRequestRate` — 请求速率过高告警
-- `HasRealTraffic` — 已有真实流量（永久告警，用于验证链路）
+- `HasRealTraffic` — 已有真实流量（用于验证链路）
 
 修改 `alerts.yml` 后重启 Prometheus 生效：`docker restart prometheus`
+
+## 运行预览
+
+> 情景一：和对话agent询问知识库内容
+>
+> <img width="1913" height="917" alt="Image" src="https://github.com/user-attachments/assets/4faf01a6-fbee-4a54-9f6f-c00bca148ee0" />
+
+> 情景二：执行AIops，运维agent自动查询告警和日志
+>
+> <img width="1916" height="917" alt="Image" src="https://github.com/user-attachments/assets/094d5110-706d-4dd0-83b6-c06d11422b00" />
+
+丰富功能开发中...
 
 ## 📝 开发指南
 
