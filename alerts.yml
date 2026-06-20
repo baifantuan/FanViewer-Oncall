@@ -1,0 +1,47 @@
+groups:
+  - name: demo
+    interval: 10s
+    rules:
+      # 告警1：始终触发，用于验证告警 API 链路
+      - alert: PrometheusIsAlive
+        expr: up{job="prometheus"} == 1
+        for: 0s
+        labels:
+          severity: info
+          service: prometheus
+        annotations:
+          summary: "Prometheus 自身监控正常"
+          description: "Prometheus 实例 {{ $labels.instance }} 正在运行，抓取目标正常"
+
+      # 告警2：FastAPI 服务存活检测
+      - alert: SuperBizAgentDown
+        expr: up{job="superbizagent"} == 0
+        for: 30s
+        labels:
+          severity: critical
+          service: superbizagent
+        annotations:
+          summary: "SuperBizAgent 服务不可达"
+          description: "SuperBizAgent 实例 {{ $labels.instance }} Prometheus 无法连接"
+
+      # 告警3：请求量过高（瞬态告警 — 速率降下来就消失）
+      - alert: HighRequestRate
+        expr: rate(http_requests_total{job="superbizagent"}[1m]) > 0.5
+        for: 10s
+        labels:
+          severity: warning
+          service: superbizagent
+        annotations:
+          summary: "请求频率过高"
+          description: "{{ $labels.path }} 一分钟内请求速率 {{ $value | humanize }}/s，超过 0.5/s 阈值"
+
+      # 告警4：已有真实流量（永久告警 — Counter 只增不减，一旦 > 50 就不消失）
+      - alert: HasRealTraffic
+        expr: http_requests_total{job="superbizagent",path!="/metrics"} > 50
+        for: 0s
+        labels:
+          severity: info
+          service: superbizagent
+        annotations:
+          summary: "已有真实业务流量"
+          description: "端点 {{ $labels.path }} 已被访问 {{ $value }} 次"

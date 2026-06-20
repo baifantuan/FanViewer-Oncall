@@ -1,0 +1,19 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+# ── 告警规则 ──────────────────────────────────────────
+rule_files:
+  - "alerts.yml"
+
+# ── 抓取目标 ──────────────────────────────────────────
+scrape_configs:
+  # 目标1：Prometheus 自我监控（自带，始终有数据）
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  # 目标2：你的 FastAPI 服务（通过 host.docker.internal 从容器访问宿主机）
+  - job_name: "superbizagent"
+    static_configs:
+      - targets: ["host.docker.internal:9900"]
