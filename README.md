@@ -22,7 +22,7 @@
 > 本地部署可直接体验功能。完整体验所有功能需要：
 > - **阿里云 DashScope API Key** — 必需，用于 LLM 对话、向量嵌入和 RAG 精排
 > - **Docker** — 用于运行 Milvus 向量数据库和 Prometheus 监控
-> - **腾讯云 CLS 账号**（可选）— 填入密钥后可通过 SDK 直连 CLS 进行真实日志查询与 AIOps 诊断
+> - **腾讯云 CLS 账号** — 填入密钥后可通过 SDK 直连 CLS 进行真实日志查询与 AIOps 诊断
 > - 复制 `.env.example` 为 `.env` 并按需填入凭据即可启动
 
 ## 项目简介
@@ -123,10 +123,10 @@ timeout /t 10
 
 # 7. 启动 MCP 服务
 # 启动 CLS 日志查询服务（新开一个 PowerShell 窗口）
-python mcp_servers/cls_server.py
+uv python mcp_servers/cls_server.py
 
 # 启动 Monitor 监控服务（新开一个 PowerShell 窗口）
-python mcp_servers/monitor_server.py
+uv python mcp_servers/monitor_server.py
 
 # 8. 启动 FastAPI 主服务（新开一个 PowerShell 窗口）
 uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 9900
