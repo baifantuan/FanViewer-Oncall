@@ -123,10 +123,10 @@ timeout /t 10
 
 # 7. 启动 MCP 服务
 # 启动 CLS 日志查询服务（新开一个 PowerShell 窗口）
-uv python mcp_servers/cls_server.py
+uv run python mcp_servers/cls_server.py
 
 # 启动 Monitor 监控服务（新开一个 PowerShell 窗口）
-uv python mcp_servers/monitor_server.py
+uv run python mcp_servers/monitor_server.py
 
 # 8. 启动 FastAPI 主服务（新开一个 PowerShell 窗口）
 uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 9900
