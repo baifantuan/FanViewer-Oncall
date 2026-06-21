@@ -7,6 +7,7 @@
 from typing import Annotated, Any, AsyncGenerator, Dict, Sequence
 
 from langchain.agents import create_agent
+from langchain.agents.middleware import AgentMiddleware
 from langchain_core.messages import (
     BaseMessage,
     HumanMessage,
@@ -38,44 +39,40 @@ class AgentState(TypedDict):
     messages: Annotated[Sequence[BaseMessage], add_messages]
 
 
-def trim_messages_middleware(state: AgentState) -> dict[str, Any] | None:
+class TrimMessagesMiddleware(AgentMiddleware):
     """
     修剪消息历史，只保留最近的几条消息以适应上下文窗口
 
     策略：
     - 保留第一条系统消息（System Message）
-    - 保留最近的 6 条消息（3 轮对话）
-    - 当消息少于等于 7 条时，不做修剪
-
-    Args:
-        state: Agent 状态
-
-    Returns:
-        包含修剪后消息的字典，如果无需修剪则返回 None
+    - 保留最近的 20 条消息（10 轮对话）
+    - 当消息少于等于 21 条时，不做修剪
     """
-    messages = state["messages"]
 
-    # 如果消息数量较少，无需修剪
-    if len(messages) <= 7:
-        return None
+    def before_model(self, state: AgentState, runtime: Any) -> dict[str, Any] | None:
+        messages = state["messages"]
 
-    # 提取第一条系统消息
-    first_msg = messages[0]
+        # 如果消息数量较少，无需修剪
+        if len(messages) <= 21:
+            return None
 
-    # 保留最近的 6 条消息（确保包含完整的对话轮次）
-    recent_messages = messages[-6:] if len(messages) % 2 == 0 else messages[-7:]
+        # 提取第一条系统消息
+        first_msg = messages[0]
 
-    # 构建新的消息列表
-    new_messages = [first_msg] + list(recent_messages)
+        # 保留最近的 20 条消息（确保包含完整的对话轮次）
+        recent_messages = messages[-20:] if len(messages) % 2 == 0 else messages[-21:]
 
-    logger.debug(f"修剪消息历史: {len(messages)} -> {len(new_messages)} 条")
+        # 构建新的消息列表
+        new_messages = [first_msg] + list(recent_messages)
 
-    return {
-        "messages": [
-            RemoveMessage(id=REMOVE_ALL_MESSAGES),
-            *new_messages
-        ]
-    }
+        logger.info(f"修剪消息历史: {len(messages)} -> {len(new_messages)} 条")
+
+        return {
+            "messages": [
+                RemoveMessage(id=REMOVE_ALL_MESSAGES),
+                *new_messages
+            ]
+        }
 
 
 class RagAgentService:
@@ -144,6 +141,7 @@ class RagAgentService:
             self.model,
             tools=all_tools,
             checkpointer=self.checkpointer,
+            middleware=[TrimMessagesMiddleware()],
         )
 
         self._agent_initialized = True
@@ -179,6 +177,7 @@ class RagAgentService:
             - 回答简洁明了，重点突出
             - 基于事实，不编造信息
             - 如有不确定的地方，明确说明
+            - 如果使用了参考资料，请在回答中简短地注明来源，例如"（参考来源 cpu_high_usage.md > 常见原因分析 > 原因1: 死循环或无限递归）"
 
             请根据用户的问题，灵活使用可用工具，提供高质量的帮助。
         """).strip()
