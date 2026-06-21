@@ -45,11 +45,15 @@ class Settings(BaseSettings):
     chunk_overlap: int = 100
 
     # MCP 服务配置（transport: stdio | sse | streamable-http）
-    # 腾讯云托管 MCP 的 URL 通常含 /sse/，需使用 sse；本地 FastMCP 使用 streamable-http
     mcp_cls_transport: str = "streamable-http"
     mcp_cls_url: str = "http://localhost:8003/mcp"
     mcp_monitor_transport: str = "streamable-http"
     mcp_monitor_url: str = "http://localhost:8004/mcp"
+
+    # 腾讯云 CLS 配置
+    tencentcloud_secret_id: str = ""
+    tencentcloud_secret_key: str = ""
+    tencentcloud_region: str = "ap-guangzhou"
 
     # Prometheus
     prometheus_base_url: str = "http://127.0.0.1:9090"

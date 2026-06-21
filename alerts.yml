@@ -35,13 +35,13 @@ groups:
           summary: "请求频率过高"
           description: "{{ $labels.path }} 一分钟内请求速率 {{ $value | humanize }}/s，超过 0.5/s 阈值"
 
-      # 告警4：已有真实流量（永久告警 — Counter 只增不减，一旦 > 50 就不消失）
-      - alert: HasRealTraffic
-        expr: http_requests_total{job="superbizagent",path!="/metrics"} > 50
+      # 告警4：最近5分钟有真实业务流量
+      - alert: HasRecentTraffic
+        expr: sum(increase(http_requests_total{job="superbizagent",path!="/metrics"}[5m])) > 0
         for: 0s
         labels:
           severity: info
           service: superbizagent
         annotations:
-          summary: "已有真实业务流量"
-          description: "端点 {{ $labels.path }} 已被访问 {{ $value }} 次"
+          summary: "最近5分钟出现真实业务请求"
+          description: "最近 5 分钟收到 {{ $value }} 次 API 调用"

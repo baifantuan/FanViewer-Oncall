@@ -22,8 +22,8 @@
 > 本地部署可直接体验功能。完整体验所有功能需要：
 > - **阿里云 DashScope API Key** — 必需，用于 LLM 对话、向量嵌入和 RAG 精排
 > - **Docker** — 用于运行 Milvus 向量数据库和 Prometheus 监控
-> - **腾讯云 CLS 账号**（可选）— 接入真实日志后可用于生产环境的日志管理和 AIOps 诊断
-> - MCP CLS/Monitor 服务当前返回模拟数据，生产环境需替换为真实 API
+> - **腾讯云 CLS 账号**（可选）— 填入密钥后可通过 SDK 直连 CLS 进行真实日志查询与 AIOps 诊断
+> - 复制 `.env.example` 为 `.env` 并按需填入凭据即可启动
 
 ## 项目简介
 
