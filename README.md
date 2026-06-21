@@ -272,6 +272,11 @@ RERANK_MODEL=qwen3-vl-rerank # 精排模型
 # 文档分块配置
 CHUNK_MAX_SIZE=800
 CHUNK_OVERLAP=100
+
+# 腾讯云 CLS 配置（填入以启用真实日志查询）
+TENCENTCLOUD_SECRET_ID=你的SecretId
+TENCENTCLOUD_SECRET_KEY=你的SecretKey
+TENCENTCLOUD_REGION=你的腾讯云日志所属地区（如ap-guangzhou）
 ```
 
 ## 🎯 AIOps 智能运维
@@ -301,8 +306,8 @@ curl -X POST "http://localhost:9900/api/aiops" \
 
 ### 诊断流程
 ```
-1. Planner 制定计划 → 生成 4-6 个诊断步骤
-2. Executor 执行步骤 → 调用 MCP 工具（日志查询、监控数据）
+1. Planner 拉取 Prometheus 告警 → 检索知识库 → 制定诊断计划
+2. Executor 执行步骤 → 调用 MCP 工具（CLS 日志查询、监控指标）
 3. Replanner 评估结果 → 决定继续/调整/生成报告
 4. 输出诊断报告 → 根因分析 + 运维建议
 ```
@@ -334,10 +339,10 @@ Prometheus 会抓取两个目标：
 ### 告警规则
 
 告警规则配置在 `alerts.yml`，当前包含：
-- `PrometheusIsAlive` — Prometheus 自身存活检测
-- `SuperBizAgentDown` — FastAPI 服务不可达告警
-- `HighRequestRate` — 请求速率过高告警
-- `HasRealTraffic` — 已有真实流量（用于验证链路）
+- `PrometheusIsAlive` — 始终触发，验证告警链路正常
+- `HasRecentTraffic` — 最近 5 分钟有真实 API 请求（面试展示用，有人调用即亮）
+- `SuperBizAgentDown` — FastAPI 服务不可达（30s 持续）
+- `HighRequestRate` — 单端点请求速率 >0.5 req/s
 
 修改 `alerts.yml` 后重启 Prometheus 生效：`docker restart prometheus`
 
