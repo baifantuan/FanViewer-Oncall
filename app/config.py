@@ -49,6 +49,8 @@ class Settings(BaseSettings):
     mcp_cls_url: str = "http://localhost:8003/mcp"
     mcp_monitor_transport: str = "streamable-http"
     mcp_monitor_url: str = "http://localhost:8004/mcp"
+    mcp_tavily_transport: str = "streamable-http"
+    mcp_tavily_url: str = "http://localhost:8005/mcp"
 
     # 腾讯云 CLS 配置
     tencentcloud_secret_id: str = ""
@@ -70,7 +72,11 @@ class Settings(BaseSettings):
             "monitor": {
                 "transport": self.mcp_monitor_transport,
                 "url": self.mcp_monitor_url,
-            }
+            },
+            "tavily": {
+                "transport": self.mcp_tavily_transport,
+                "url": self.mcp_tavily_url,
+            },
         }
 
 

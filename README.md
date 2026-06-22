@@ -23,6 +23,7 @@
 > - **阿里云 DashScope API Key** — 必需，用于 LLM 对话、向量嵌入和 RAG 精排
 > - **Docker** — 用于运行 Milvus 向量数据库和 Prometheus 监控
 > - **腾讯云 CLS 账号** — 填入密钥后可通过 SDK 直连 CLS 进行真实日志查询与 AIOps 诊断
+> - **Tavily API Key** — 可选，启用 Agent 联网搜索
 > - 复制 `.env.example` 为 `.env` 并按需填入凭据即可启动
 
 ## 项目简介
@@ -37,7 +38,7 @@ Fan Viewer 是一个基于 **LangChain + LangGraph** 构建的企业级智能对
 - 📚 **RAG 问答** - 两阶段检索（粗检索 top-15 + qwen3-vl-rerank 精排 top-4），支持文档上传和自动向量索引
 - 🔧 **AIOps 诊断** - Plan-Execute-Replan 自动故障诊断和根因分析
 - 🌐 **Web 界面** - 现代化 UI，支持多种对话模式：快速问答/流式对话
-- 🔌 **MCP 集成** - 日志查询和监控数据工具接入
+- 🔌 **MCP 集成** - 日志查询、监控数据、Tavily 联网搜索等工具统一接入
 
 ## 🛠️ 技术栈
 
@@ -127,6 +128,9 @@ uv run python mcp_servers/cls_server.py
 
 # 启动 Monitor 监控服务（新开一个 PowerShell 窗口）
 uv run python mcp_servers/monitor_server.py
+
+# 启动 Tavily 联网搜索服务（新开一个 PowerShell 窗口）
+uv run python mcp_servers/tavily_server.py
 
 # 8. 启动 FastAPI 主服务（新开一个 PowerShell 窗口）
 uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 9900
@@ -229,6 +233,7 @@ super_biz_agent_py/
 ├── mcp_servers/                            # MCP 服务器
 │   ├── cls_server.py                       # CLS 日志查询服务
 │   ├── monitor_server.py                   # 监控数据服务
+│   ├── tavily_server.py                    # Tavily 联网搜索服务
 │   └── README.md                           # MCP 服务说明
 ├── aiops-docs/                             # 运维知识库（Markdown 文档）
 ├── logs/                                   # 日志目录（Loguru 自动创建）
@@ -277,6 +282,9 @@ CHUNK_OVERLAP=100
 TENCENTCLOUD_SECRET_ID=你的SecretId
 TENCENTCLOUD_SECRET_KEY=你的SecretKey
 TENCENTCLOUD_REGION=你的腾讯云日志所属地区（如ap-guangzhou）
+
+# Tavily 联网搜索配置
+TAVILY_API_KEY=你的tavily-key
 ```
 
 ## 🎯 AIOps 智能运维

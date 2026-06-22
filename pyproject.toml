@@ -31,6 +31,7 @@ dependencies = [
     "fastmcp>=2.14.0",
     "langchain-qwq>=0.3.4",
     "tencentcloud-sdk-python-cls>=3.1.111",
+    "tavily-python>=0.7.26",
 ]
 
 [project.optional-dependencies]
